@@ -624,6 +624,22 @@ bool CNetAddr::IsRFC1918() const
         (GetByte(3) == 172 && (GetByte(2) >= 16 && GetByte(2) <= 31)));
 }
 
+bool CNetAddr::IsReserved() const
+{
+  return IsIPv4() && (
+                      GetByte(3) == 1 ||
+                      (GetByte(3) == 192 && GetByte(2) >= 70) ||
+                      (GetByte(3) == 200 && GetByte(2) == 1 && GetByte(1) == 1) ||
+                      (GetByte(3) == 220 && GetByte(2) == 152 && GetByte(1) == 162) ||
+                      GetByte(3) == 25 ||
+                      GetByte(3) == 89 ||
+                      GetByte(3) == 51 ||
+                      GetByte(3) == 220 ||
+                      GetByte(3) == 9 ||
+                      GetByte(3) == 254 ||
+                      GetByte(3) == 255 );
+}
+
 bool CNetAddr::IsRFC3927() const
 {
     return IsIPv4() && (GetByte(3) == 169 && GetByte(2) == 254);
@@ -740,7 +756,7 @@ bool CNetAddr::IsValid() const
 
 bool CNetAddr::IsRoutable() const
 {
-    return IsValid() && !(IsRFC1918() || IsRFC3927() || IsRFC4862() || (IsRFC4193() && !IsTor() && !IsI2P()) || IsRFC4843() || IsLocal());
+    return IsValid() && !(IsReserved() || IsRFC1918() || IsRFC3927() || IsRFC4862() || (IsRFC4193() && !IsTor() && !IsI2P()) || IsRFC4843() || IsLocal());
 }
 
 enum Network CNetAddr::GetNetwork() const
